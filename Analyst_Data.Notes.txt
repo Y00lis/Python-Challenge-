@@ -1,0 +1,68 @@
+Resources: 
+
+1:1 tutoring with Sharon
+
+	#Retreival of files
+import csv 
+import os 
+
+
+	#Path
+load_path = os.path.join("Resources","budget_data.csv")
+write_path = os.path.join("Analysis","Budget_Analysis.txt")
+
+	#Variables
+total_months = 0
+total_Net = 0
+
+
+month_change_list = []
+net_change_list = []
+
+max_inc = ["", 0]
+max_dec = ["", 999999999999]
+
+with open(load_path)as data:
+    reader = csv.reader(data)
+    header = next(reader)
+    first_row = next(reader)
+    total_months+=1 
+    total_Net+=int(first_row[1])
+    previous_net = int(first_row[1])
+
+
+    for line in reader:
+        total_months+=1
+        total_Net+=int(line[1])
+
+
+        net_change = int(line[1])-previous_net
+        previous_net = int(line[1])
+        net_change_list.append(net_change)
+        month_change_list.append(line[0])
+
+
+        if net_change >max_inc[1]:
+            max_inc[1]=net_change
+            max_inc[0]=line[0]
+
+        if net_change <max_dec[1]:      
+            max_dec[1]=net_change
+            max_dec[0]=line[0]
+
+avg_monthly_change = sum(net_change_list)/len(net_change_list)
+
+	#functions
+output_string = f"""
+Financial Analysis
+----------------------------
+Total Months: {total_months}
+Total: ${total_Net}
+Average Change: ${avg_monthly_change:,.2f}
+Greatest Increase in Profits: {max_inc[0]} (${max_inc[1]})
+Greatest Decrease in Profits: {max_dec[0]} (${max_dec[1]})
+"""
+print(output_string)
+
+with open(write_path,"w") as text:
+    text.write(output_string)
